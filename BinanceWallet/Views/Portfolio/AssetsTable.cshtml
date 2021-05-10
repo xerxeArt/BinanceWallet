@@ -1,0 +1,76 @@
+﻿@using BinanceWallet.ViewModels
+@using BinanceWallet.Helpers
+@model IEnumerable<AssetInventoryInformationViewModel>
+
+@{
+    decimal eur, usdt;
+    usdt = (decimal)ViewBag.usdt;
+    eur = (decimal)ViewBag.eur;
+
+}
+
+<table class="assets-table">
+    <thead>
+        <tr>
+            <th colspan="4">Binance market info</th>
+            <th colspan="4">Wallet info</th>
+            <th colspan="3">Profit info</th>
+        </tr>
+        <tr>
+            @* Market *@
+            <th>Asset</th>
+            <th>Current price</th>
+            <th>EUR</th>
+            <th>USDT</th>
+            @* Wallet *@
+            <th>BPWA</th>
+            <th>Held count</th>
+            <th>Held amount</th>
+            <th>Held EUR</th>
+            @* Profit *@
+            <th>%</th>
+            <th>BTC</th>
+            <th>EUR</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var asset in Model.OrderBy(x => x.ProfitPercent))
+        {
+            <tr class="@(asset.HoldingAmount >= 0.00300000m ? "important-asset" : "")">
+                @* Market *@
+                <td>
+                    <a 
+                       href="https://www.binance.com/en/trade/@(asset.AssetName)_@(asset.Market)?layout=pro&type=spot"
+                       target="_blank">
+                        @(asset.AssetName)_@(asset.Market)
+                    </a>
+                </td>
+                <td class="currency-cell">@(HelperMethods.FormatCurrency(asset.CurrentPrice))</td>
+                <td class="currency-cell">
+                    @(HelperMethods.FormatCurrency(asset.CurrentPriceConverted, 2))
+                </td>
+                <td class="currency-cell">
+                    @(HelperMethods.FormatCurrency(asset.CurrentPriceConverted / eur * usdt, 2))
+                </td>
+                @* Wallet *@
+                <td class="currency-cell">@(HelperMethods.FormatCurrency(asset.BuyPriceWeightedAvg))</td>
+                <td class="currency-cell">@(HelperMethods.FormatCurrency(asset.HoldingCount))</td>
+                <td class="currency-cell">@(HelperMethods.FormatCurrency(asset.HoldingAmount))</td>
+                <td class="currency-cell">@(HelperMethods.FormatCurrency(asset.HoldingAmountConverted, 2))</td>
+                @* Profit *@
+                <td style="color: @($"#{asset.RgbColor}")" class="percentage-cell">@HelperMethods.FormatPercentage(asset.ProfitPercent)</td>
+                @{
+                    string cellClass = "";
+                    if (asset.ProfitValue >= 0.001m) cellClass = "alert-high-cell";
+                    else if (asset.ProfitValue <= -0.001m) cellClass = "alert-low-cell";
+                }
+                <td class="currency-cell @(cellClass)">@(HelperMethods.FormatCurrency(asset.ProfitValue))</td>
+                @{
+                    if (asset.ProfitValueConverted >= 50m) cellClass = "alert-high-cell";
+                    else if (asset.ProfitValueConverted <= -50m) cellClass = "alert-low-cell";
+                }
+                <td class="currency-cell @(cellClass)">@(HelperMethods.FormatCurrency(asset.ProfitValueConverted, 2))</td>
+            </tr>
+        }
+    </tbody>
+</table>
