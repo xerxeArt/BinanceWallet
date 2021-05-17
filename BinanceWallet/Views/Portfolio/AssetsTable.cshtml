@@ -1,10 +1,10 @@
 ﻿@using BinanceWallet.ViewModels
 @using BinanceWallet.Helpers
-@model IEnumerable<AssetInventoryInformationViewModel>
+@model AssetTableViewModel
 
 @{
-    decimal eur, usdt;
-    usdt = (decimal)ViewBag.usdt;
+    decimal eur, busd;
+    busd = (decimal)ViewBag.busd;
     eur = (decimal)ViewBag.eur;
 
 }
@@ -21,7 +21,7 @@
             <th>Asset</th>
             <th>Current price</th>
             <th>EUR</th>
-            <th>USDT</th>
+            <th>BUSD</th>
             @* Wallet *@
             <th>BPWA</th>
             <th>Held count</th>
@@ -34,23 +34,21 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var asset in Model.OrderBy(x => x.ProfitPercent))
+        @foreach (var asset in Model.Assets.OrderBy(x => x.ProfitPercent))
         {
-            <tr class="@(asset.HoldingAmount >= 0.00300000m ? "important-asset" : "")">
+            <tr class="@(asset.HoldingAmount >= 0.00500000m ? "important-asset" : "")">
                 @* Market *@
                 <td>
-                    <a 
-                       href="https://www.binance.com/en/trade/@(asset.AssetName)_@(asset.Market)?layout=pro&type=spot"
-                       target="_blank">
-                        @(asset.AssetName)_@(asset.Market)
-                    </a>
-                </td>
-                <td class="currency-cell">@(HelperMethods.FormatCurrency(asset.CurrentPrice))</td>
-                <td class="currency-cell">
-                    @(HelperMethods.FormatCurrency(asset.CurrentPriceConverted, 2))
+                    @(HelperMethods.GetTradeLink(asset.AssetName, asset.Market, null))
                 </td>
                 <td class="currency-cell">
-                    @(HelperMethods.FormatCurrency(asset.CurrentPriceConverted / eur * usdt, 2))
+                    @(HelperMethods.GetTradeLink(asset.AssetName, "BTC", HelperMethods.FormatCurrency(asset.CurrentPrice)))
+                </td>
+                <td class="currency-cell">
+                    @(HelperMethods.GetTradeLink(asset.AssetName, "EUR", HelperMethods.FormatCurrency(asset.CurrentPriceConverted, 2)))
+                </td>
+                <td class="currency-cell">
+                    @(HelperMethods.GetTradeLink(asset.AssetName, "BUSD", HelperMethods.FormatCurrency(asset.CurrentPriceConverted / eur * busd, 2)))
                 </td>
                 @* Wallet *@
                 <td class="currency-cell">@(HelperMethods.FormatCurrency(asset.BuyPriceWeightedAvg))</td>
@@ -58,7 +56,7 @@
                 <td class="currency-cell">@(HelperMethods.FormatCurrency(asset.HoldingAmount))</td>
                 <td class="currency-cell">@(HelperMethods.FormatCurrency(asset.HoldingAmountConverted, 2))</td>
                 @* Profit *@
-                <td style="color: @($"#{asset.RgbColor}")" class="percentage-cell">@HelperMethods.FormatPercentage(asset.ProfitPercent)</td>
+<td style="color: @($"#{asset.RgbColor}")" class="percentage-cell">@HelperMethods.FormatPercentage(asset.ProfitPercent)</td>
                 @{
                     string cellClass = "";
                     if (asset.ProfitValue >= 0.001m) cellClass = "alert-high-cell";

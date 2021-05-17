@@ -10,6 +10,6 @@ namespace Data.Business
         List<Asset> GetStoredPrices();
         Task InitializeData();
         Task UpdateWalletHoldings();
-        (decimal btcEur, decimal btcUsdt) GetBtcFiatValues();
+        (decimal btcEur, decimal btcBusd) GetBtcFiatValues();
     }
 }

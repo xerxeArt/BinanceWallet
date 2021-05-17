@@ -59,11 +59,15 @@ namespace Data.EF.Repositories
 
             foreach (var currVal in assetWalletValues)
             {
-                var asset = assets.FirstOrDefault(x => x.Name == currVal.Name);
-                if (asset != null)
-                {
-                    asset.WalletHolding = currVal.WalletHolding;
-                }
+                assets
+                    .Where(x => x.Name == currVal.Name)
+                    .ToList()
+                    .ForEach(e => {
+                        e.WalletHolding = currVal.WalletHolding;
+                        e.IsOnBtcMarket = currVal.IsOnBtcMarket;
+                        e.IsOnEurMarket = currVal.IsOnEurMarket;
+                        e.IsOnBusdMarket = currVal.IsOnBusdMarket;
+                    });
             }
 
             //Clear 0 assets
@@ -83,7 +87,7 @@ namespace Data.EF.Repositories
         {
             string market, assetName;
             var marketValueBtcEur = assets.FirstOrDefault(x => x.Name == "BTC" && x.Market == "EUR")?.CurrentValue;
-            var marketValueBtcUsdt = assets.FirstOrDefault(x => x.Name == "BTC" && x.Market == "USDT")?.CurrentValue;
+            var marketValueBtcBusd = assets.FirstOrDefault(x => x.Name == "BTC" && x.Market == "BUSD")?.CurrentValue;
             decimal? marketValue;
 
             foreach (var asset in assets)
@@ -91,17 +95,17 @@ namespace Data.EF.Repositories
                 market = asset.Market;
                 assetName = asset.Name;
                 if (asset.Name == "BTC" && asset.Market == "EUR") marketValue = 1;
-                else if (asset.Name == "BTC" && asset.Market == "USDT") marketValue = marketValueBtcEur / marketValueBtcUsdt;
-                else if (asset.Market == "USDT") marketValue = marketValueBtcUsdt;
+                else if (asset.Name == "BTC" && asset.Market == "BUSD") marketValue = marketValueBtcEur / marketValueBtcBusd;
+                else if (asset.Market == "BUSD") marketValue = marketValueBtcBusd;
                 else if (asset.Market == "BTC") marketValue = marketValueBtcEur;
                 else marketValue = assets.FirstOrDefault(x => x.Name == assetName && x.Market == market)?.CurrentValue;
 
                 if (marketValue == null) continue;
 
-                if (asset.Name != "BTC" && asset.Market == "USDT") asset.CurrentFiatValue = marketValueBtcEur / marketValueBtcUsdt ?? 0;
-                else if (asset.Market == "USDT")
+                if (asset.Name != "BTC" && asset.Market == "BUSD") asset.CurrentFiatValue = marketValueBtcEur / marketValueBtcBusd ?? 0;
+                else if (asset.Market == "BUSD")
                 {
-                    asset.CurrentFiatValue = asset.WalletHolding * marketValueBtcUsdt ?? 0;
+                    asset.CurrentFiatValue = asset.WalletHolding * marketValueBtcBusd ?? 0;
                 }
                 else
                 {

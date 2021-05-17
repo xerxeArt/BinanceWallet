@@ -1,3 +1,4 @@
+using BinanceWallet.Middleware;
 using Data.BinanceApi;
 using Data.Business;
 using Data.Configuration;
@@ -30,9 +31,11 @@ namespace BinanceWallet
         {
             var binanceConfig = Configuration.GetSection("BinanceConfig").Get<BinanceConfig>();
             var dbConfig = Configuration.GetSection("DbConfig").Get<DbConfig>();
+            var appConfig = Configuration.GetSection("ApplicationConfig").Get<ApplicationConfig>();
 
             services.AddControllersWithViews();
             services.AddSingleton(binanceConfig);
+            services.AddSingleton(appConfig);
             //services.AddSingleton(dbConfig);
             services.AddScoped<IHttpUtilities, HttpUtilities>();
             services.AddScoped<IBusinessFlow, BusinessFlow>();
@@ -87,6 +90,8 @@ namespace BinanceWallet
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
+
+            app.UseConfigFromQuerystring();
         }
     }
 }

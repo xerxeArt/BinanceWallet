@@ -53,20 +53,15 @@ namespace Data.Business
         {
             var assets = await _dataGathering.GetWalletAssets();
 
-            List<Asset> assetsList = new List<Asset>();
-            foreach (var assetPrice in assets)
-            {
-                assetsList.Add(new Asset { Name = assetPrice.Name, WalletHolding = assetPrice.WalletHolding });
-            }
-            await _binanceRepository.PopulateWalletHoldings(assetsList);
+            await _binanceRepository.PopulateWalletHoldings(assets);
         }
 
-        public (decimal btcEur, decimal btcUsdt) GetBtcFiatValues()
+        public (decimal btcEur, decimal btcBusd) GetBtcFiatValues()
         {
             var assets = _binanceRepository.GetAssets();
             var eur = assets.FirstOrDefault(x => x.Name == "BTC" && x.Market == "EUR")?.CurrentValue ?? 0m;
-            var usdt = assets.FirstOrDefault(x => x.Name == "BTC" && x.Market == "USDT")?.CurrentValue ?? 0m;
-            return (eur, usdt);
+            var busd = assets.FirstOrDefault(x => x.Name == "BTC" && x.Market == "BUSD")?.CurrentValue ?? 0m;
+            return (eur, busd);
         }
 
     }

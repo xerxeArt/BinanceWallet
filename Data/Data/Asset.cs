@@ -9,5 +9,8 @@
         public decimal CurrentFiatValue { get; set; }
         public decimal WalletHolding { get; set; }
         public decimal BuyPriceWeightedAvg { get; set; }
+        public bool IsOnBtcMarket { get; set; }
+        public bool IsOnEurMarket { get; set; }
+        public bool IsOnBusdMarket { get; set; }
     }
 }

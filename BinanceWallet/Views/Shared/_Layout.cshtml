@@ -22,11 +22,8 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
                     <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
                         @*<li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                             </li>*@
                         <li class="nav-item">
                             @Html.ActionLink("Stored assets", "GetAssets", "Portfolio", new object { }, new { @class = "nav-link text-dark" })
@@ -42,6 +39,22 @@
                         </li>
                     </ul>
                 </div>
+                @*<div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
+                        <ul class="navbar-nav flex-grow-1">
+                            <li class="nav-item">
+                                @Html.ActionLink("Stored assets", "GetAssets", "Portfolio", new { BpwaCsvFileName = "CoinsBUSD.csv" }, new { @class = "nav-link text-dark" })
+                            </li>
+                            <li class="nav-item">
+                                @Html.ActionLink("Refresh current prices", "GetRefreshedAssets", "Portfolio", new { BpwaCsvFileName = "CoinsBUSD.csv" }, new { @class = "nav-link text-dark" })
+                            </li>
+                            <li class="nav-item">
+                                @Html.ActionLink("Refresh wallet holdings", "RefreshWalletHoldings", "Portfolio", new { BpwaCsvFileName = "CoinsBUSD.csv" }, new { @class = "nav-link text-dark" })
+                            </li>
+                            <li class="nav-item">
+                                @Html.ActionLink("Initialize", "InitializeWalletData", "Portfolio", new { BpwaCsvFileName = "CoinsBUSD.csv" }, new { @class = "nav-link text-dark" })
+                            </li>
+                        </ul>
+                    </div>*@
             </div>
         </nav>
     </header>

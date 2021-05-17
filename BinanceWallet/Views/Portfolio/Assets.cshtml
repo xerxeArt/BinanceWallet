@@ -1,8 +1,9 @@
 ﻿@using BinanceWallet.Helpers
+@using BinanceWallet.ViewModels
 @model BinanceWallet.ViewModels.AssetInventoryViewModel
 @{
     ViewData["Title"] = "Portfolio assets inventory";
-    ViewBag.usdt = Model.BtcUsdtValue;
+    ViewBag.busd = Model.BtcBusdValue;
     ViewBag.eur = Model.BtcEurValue;
 }
 
@@ -13,7 +14,7 @@
         <div class="col">@($"{DateTime.Now.ToString("yyyy.MM.dd HH:mm:ss")}")</div>
     </div>
     <div class="row">
-        <div class="col">BTCUSDT=@(HelperMethods.FormatCurrency(Model.BtcUsdtValue, 2))</div>
+        <div class="col">BTCBUSD=@(HelperMethods.FormatCurrency(Model.BtcBusdValue, 2))</div>
         <div class="col">1000 SAT = @(HelperMethods.FormatCurrency(Model.BtcEurValue / 100000m, 2)) EUR</div>
         <div class="col"></div>
     </div>
@@ -31,12 +32,16 @@
 
 <div class="tab-content" id="myTabContent">
     <div id="ownedAssets" class="tab-pane fade show active">
-        @{await Html.RenderPartialAsync("AssetsTable", Model.GetAssets().Where(x => x.HoldingAmount != 0 && x.BuyPriceWeightedAvg != 0)); }
+        @{await Html.RenderPartialAsync("AssetsTable", new AssetTableViewModel{ TableId = "ownedAssetsTable", Assets = Model.GetAssets().Where(x => x.HoldingAmount != 0 && x.BuyPriceWeightedAvg != 0)}); }
     </div>
     <div id="watchedAssets" class="tab-pane fade">
-        @{await Html.RenderPartialAsync("AssetsTable", Model.GetAssets().Where(x => x.HoldingAmount == 0 || x.BuyPriceWeightedAvg == 0)); }
+        @{await Html.RenderPartialAsync("AssetsTable", new AssetTableViewModel{ TableId = "watchedAssetsTable", Assets = Model.GetAssets().Where(x => x.HoldingAmount == 0 || x.BuyPriceWeightedAvg == 0)}); }
     </div>
 </div>
+
+@*<div>
+        <button onclick="navigator.clipboard.writeText(document.getElementById('ownedAssets').innerHTML)">Copy Owned Assets</button>
+    </div>*@
 
 <div class="profit-div">
     @{
@@ -46,8 +51,9 @@
         var totalBtcProfit = btcAssets.Sum(x => x.ProfitValue);
         var totalEurValue = btcAssets.Sum(x => x.HoldingAmountConverted);
         var totalEuroProfit = btcAssets.Sum(x => x.ProfitValueConverted);
-        var totalUsdtValue = Model.GetAssets().Where(x => x.Market == "USDT").Sum(x => x.HoldingAmount);
-        var totalUsdtProfit = Model.GetAssets().Where(x => x.Market == "USDT").Sum(x => x.ProfitValue);
+        var totalBusdValue = Model.GetAssets().Where(x => x.Market == "BUSD").Sum(x => x.HoldingAmount);
+        var totalBusdProfit = Model.GetAssets().Where(x => x.Market == "BUSD").Sum(x => x.ProfitValue);
+        var btcRatioVsBpwa = Model.BtcEurValue / Model.GetAssets().Where(x => x.AssetName == "BTC" && x.Market == "EUR").Sum(x => x.BuyPriceWeightedAvg);
     }
     <span>BTC profit: @HelperMethods.FormatCurrency(totalBtcProfit, 8)</span>
     <br />
@@ -56,4 +62,6 @@
     <span>EURO profit: @HelperMethods.FormatCurrency(totalEuroProfit, 2)</span>
     <br />
     <span>Sum of EURO: @HelperMethods.FormatCurrency(totalEurValue, 2)</span>
+    <br />
+    <span>"Real" profit (when BTC recovers): @HelperMethods.FormatCurrency(totalEurValue / btcRatioVsBpwa, 2)</span>
 </div>

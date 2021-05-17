@@ -1,4 +1,5 @@
-﻿using Data.Data;
+﻿using Data.Configuration;
+using Data.Data;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,6 +9,13 @@ namespace Data.Business
 {
     public class DataTransformation : IDataTransformation
     {
+        private readonly ApplicationConfig _appConfig;
+
+        public DataTransformation(ApplicationConfig appConfig)
+        {
+            _appConfig = appConfig ?? throw new ArgumentNullException(nameof(appConfig));
+        }
+
         public List<Asset> GetAssets(List<Asset> currentValues, List<Asset> walletValues)
         {
             var assets = new List<Asset>();
@@ -32,7 +40,8 @@ namespace Data.Business
             var myAssets = new List<Asset>();
 
             string fileContents;
-            using (var stream = new FileStream(@"D:\SharedFolder\Coins.csv", FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            string filePath = Path.Combine(_appConfig.BpwaCsvFilePath, _appConfig.BpwaCsvFileName);
+            using (var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             {
                 using (var reader = new StreamReader(stream))
                 {

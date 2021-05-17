@@ -16,6 +16,7 @@ namespace Data.Business
 
         private static object _lock = new object();
 
+        #region Interface Implementation
         public DataGathering(ILogger<DataGathering> logger, IApiRequest apiRequests)
         {
             this._logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -30,7 +31,8 @@ namespace Data.Business
             if (string.IsNullOrEmpty(result)) return walletAssets;
             var jsonResult = JToken.Parse(result);
 
-            var nonZeroAssets = jsonResult.SelectTokens("$.balances[?(@.free != '0.00000000')]");
+            //TODO: check also locked != 0
+            var nonZeroAssets = jsonResult.SelectTokens("$.balances[?(@.free != '0.00000000' || @.locked != '0.00000000')]");
             foreach (var asset in nonZeroAssets)
             {
                 var assetName = asset.SelectToken("asset").Value<string>();
@@ -39,7 +41,10 @@ namespace Data.Business
                 walletAssets.Add(new Asset
                 {
                     Name = assetName,
-                    WalletHolding = assetValue
+                    WalletHolding = assetValue,
+                    IsOnBtcMarket = AssetAndMarketExistsInResponse(jsonResult, assetName, "BTC"),
+                    IsOnEurMarket = AssetAndMarketExistsInResponse(jsonResult, assetName, "EUR"),
+                    IsOnBusdMarket = AssetAndMarketExistsInResponse(jsonResult, assetName, "BUSD")
                 });
             }
             return walletAssets;
@@ -53,23 +58,6 @@ namespace Data.Business
             {
                 try
                 {
-                    switch (asset)
-                    {
-                        case "BTC":
-                            market = "EUR";
-                            break;
-                        case "DENT":
-                        case "WIN":
-                            market = "USDT";
-                            break;
-                        case "USDT":
-                        case "EUR":
-                            continue;
-                        default:
-                            market = "BTC";
-                            break;
-                    }
-
                     _logger.LogWarning($"Retrieving {asset}");
                     var result = await DoGetRequest(asset, market);
                     if (string.IsNullOrEmpty(result)) return assetPrices;
@@ -138,7 +126,9 @@ namespace Data.Business
 
             return assetPrices;
         }
+        #endregion
 
+        #region Private Methods
         private async Task<string> DoGetRequest(string asset, string market)
         {
             return await _apiRequests.PerformGetRequest("/api/v3/ticker/price", new Dictionary<string, string> { { "symbol", $"{asset}{market}" } }, false);
@@ -187,5 +177,13 @@ namespace Data.Business
                 CurrentValue = price
             };
         }
+
+        private bool AssetAndMarketExistsInResponse(JToken response, string assetName, string marketName)
+        {
+            return true;
+            //return response.SelectToken("")
+        } 
+        #endregion
+
     }
 }

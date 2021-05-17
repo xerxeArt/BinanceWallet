@@ -7,14 +7,14 @@ namespace BinanceWallet.ViewModels
     public class AssetInventoryViewModel
     {
         public decimal BtcEurValue { get; }
-        public decimal BtcUsdtValue { get; }
+        public decimal BtcBusdValue { get; }
 
         protected List<AssetInventoryInformationViewModel> Assets { get; set; }
-        public AssetInventoryViewModel(decimal btcEurValue, decimal btcUsdtValue)
+        public AssetInventoryViewModel(decimal btcEurValue, decimal btcBusdValue)
         {
             Assets = new List<AssetInventoryInformationViewModel>();
             BtcEurValue = btcEurValue;
-            BtcUsdtValue = btcUsdtValue;
+            BtcBusdValue = btcBusdValue;
         }
 
         public List<AssetInventoryInformationViewModel> GetAssets()
@@ -39,9 +39,9 @@ namespace BinanceWallet.ViewModels
                 ProfitPercent = profitRatio * 100,
             };
 
-            if (asset.Market == "USDT" && asset.Name != "BTC")
+            if (asset.Market == "BUSD" && asset.Name != "BTC")
             {
-                newAsset.HoldingAmount = asset.WalletHolding * asset.CurrentValue / BtcUsdtValue;
+                newAsset.HoldingAmount = asset.WalletHolding * asset.CurrentValue / BtcBusdValue;
                 newAsset.HoldingAmountConverted = newAsset.HoldingAmount * BtcEurValue;
             }
 
@@ -76,21 +76,5 @@ namespace BinanceWallet.ViewModels
 
             return $"{r:X2}{g:X2}{b:X2}";
         }
-    }
-
-    public class AssetInventoryInformationViewModel
-    {
-        public string AssetName { get; set; }
-        public string Market { get; set; }
-        public decimal CurrentPrice { get; set; }
-        public decimal CurrentPriceConverted { get; set; }
-        public decimal HoldingCount { get; set; }
-        public decimal BuyPriceWeightedAvg { get; set; }
-        public decimal HoldingAmount { get; set; }
-        public decimal HoldingAmountConverted { get; set; }
-        public decimal ProfitPercent { get; set; }
-        public decimal ProfitValue { get; set; }
-        public decimal ProfitValueConverted { get; set; }
-        public string RgbColor { get; set; }
     }
 }

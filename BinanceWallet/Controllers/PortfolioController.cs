@@ -53,9 +53,9 @@ namespace BinanceWallet.Controllers
 
         private AssetInventoryViewModel ConvertFromAssetList(List<Asset> assets)
         {
-            decimal btcEur, btcUsdt;
-            (btcEur, btcUsdt) = _businessFlow.GetBtcFiatValues();
-            var model = new AssetInventoryViewModel(btcEur, btcUsdt);
+            decimal btcEur, btcBusd;
+            (btcEur, btcBusd) = _businessFlow.GetBtcFiatValues();
+            var model = new AssetInventoryViewModel(btcEur, btcBusd);
             foreach (var asset in assets)
             {
                 model.AddAsset(asset);
